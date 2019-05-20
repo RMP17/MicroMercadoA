@@ -1,0 +1,25 @@
+<div class="dropdown" (keydown.ArrowDown)="down()" (keydown.ArrowUp)="up()"
+    (mouseover)="mouseOverSuggestions = true;"
+    (mouseout)="mouseOverSuggestions = false;"
+    >
+    <input type="text" class="form-control"
+           (input)="query()"
+           (keydown.enter)="pressSelectSuggestion()"
+           (keydown.tab)="suggestionHidden()"
+           [(ngModel)]="input"
+           (blur)="suggestionOnBlur()"
+           [placeholder]="inputPlaceholder || ''"
+    >
+    <div #listSeggestions [ngClass]="{'show': showSuggestions}" class="dropdown-menu  m-0 w-100 cursor" aria-labelledby="dropdownMenuButton"
+         onmousedown="return false;">
+        <a *ngFor="let persona of personas; let i = index"
+           [ngClass]="{'active': indexElement === i }"
+           class="dropdown-item"
+           (click)="clickSelectSuggestion(persona)"
+           (mouseover)="indexChange(i)"
+        >
+            <span>{{persona.nombre}}</span>
+            <span class="float-right">{{persona.ci}}</span>
+        </a>
+    </div>
+</div>

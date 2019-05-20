@@ -1,0 +1,177 @@
+<!--<div class="sidenav">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+        <a class="nav-link active show" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-comprar" role="tab"
+           aria-controls="v-pills-comprar" aria-selected="true">
+            <span class="oi oi-info size-icons-13"></span> Cajas</a>
+
+    </div>
+</div>-->
+<div class="main">
+    <h3>Configuración</h3>
+    <div class="col-lg-10" >
+        <form #formConfiguration  (submit)="sendDataCondiguration()">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label text-right">Nombre del supermercado</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputName" name="nombre_super_mercado" [(ngModel)]="configuracion.nombre_super_mercado">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputDe" class="col-sm-4 col-form-label text-right">De</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputDe" name="propietaria" [(ngModel)]="configuracion.propietario_a">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputMatrixHouse" class="col-sm-4 col-form-label text-right">Casa matriz</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputMatrixHouse" name="casa_matriz" [(ngModel)]="configuracion.casa_matriz">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputTelephone" class="col-sm-4 col-form-label text-right">Teléfono</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputTelephone" name="telefono" [(ngModel)]="configuracion.telefono">
+            </div>
+        </div>
+        <hr>
+        <div class="form-group row">
+            <label for="inputNit" class="col-sm-4 col-form-label text-right">Nit</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputNit" name="nit" [(ngModel)]="configuracion.nit">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputNroFactura" class="col-sm-4 col-form-label text-right">Número de la factura</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputNroFactura" name="nro_factura" [(ngModel)]="configuracion.numero_factura">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputAutorizacion" class="col-sm-4 col-form-label text-right">Número de autorización</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputAutorizacion" name="autorizacion" [(ngModel)]="configuracion.autorizacion">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputFechalimite" class="col-sm-4 col-form-label text-right">Fecha límite de emisión</label>
+            <div class="col-sm-8">
+                <input type="date" class="form-control" id="inputFechalimite" name="fecha_limite_emision" [(ngModel)]="configuracion.fecha_limite_emision">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 col-form-label text-right" for="inputDosificacion">Llave</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="inputDosificacion" rows="1" name="llave" [(ngModel)]="configuracion.dosificacion"></textarea>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group row">
+            <label for="inputDateAfterShow" class="col-sm-4 col-form-label text-right">
+                Notifica productos por caducar en</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="dias_antes_mostrar_vencimiento"
+                       id="inputDateAfterShow"
+                       placeholder="Días" [(ngModel)]="configuracion.dias_antes_mostrar_vencimiento">
+
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputDateAfterShowStock" class="col-sm-4 col-form-label text-right">
+                Notificar bajo stock en</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="stock_min_antes_mostrar"
+                       id="inputDateAfterShowStock" placeholder="Cantidad" [(ngModel)]="configuracion.stock_min_antes_mostrar">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 col-form-label"></label>
+            <div class="col-sm-8">
+                <button type="submit" class="btn btn-outline-info w-100">Guardar</button>
+                <button type="button" class="btn btn-outline-info w-100"
+                        data-toggle="modal" data-target="#testControlCodeModal">Realizar Pruebas de Dosificación</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+<!--===============================================Modal Test de Codigo de Control===============================================-->
+<div class="modal fade" id="testControlCodeModal" tabindex="-1" role="dialog" aria-labelledby="testControlCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testControlCodeModalLabel">Pruebas para la dosificación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #testControlCodeForm (submit)="getTestControlCode()">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-4 col-form-label text-right">Número de autorización</label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" [(ngModel)]="testControlCode.nro_autorizacion"
+                            name="nro_autorizacion">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputInvoiceNumber" class="col-sm-4 col-form-label text-right">Número de factura</label>
+                        <div class="col-sm-7">
+                            <input id="inputInvoiceNumber" type="text" class="form-control" [(ngModel)]="testControlCode.nro_factura"
+                                   name="nro_factura">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputNitTest" class="col-sm-4 col-form-label text-right">Nit</label>
+                        <div class="col-sm-7">
+                            <input id="inputNitTest" type="text" class="form-control" [(ngModel)]="testControlCode.nit"
+                                   name="test_nit">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputDate" class="col-sm-4 col-form-label text-right">Fecha</label>
+                        <div class="col-sm-7">
+                            <input id="inputDate" type="date" class="form-control" [(ngModel)]="testControlCode.fecha"
+                                   name="test_date">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputRode" class="col-sm-4 col-form-label text-right">Monto</label>
+                        <div class="col-sm-7">
+                            <input id="inputRode" type="text" class="form-control" [(ngModel)]="testControlCode.monto"
+                                   name="test_monto">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputKey" class="col-sm-4 col-form-label text-right">Llave</label>
+                        <div class="col-sm-7">
+                            <textarea id="inputKey" type="date" class="form-control" [(ngModel)]="testControlCode.llave" rows="2"
+                                      name="key"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputKeyV" class="col-sm-4 col-form-label text-right">Verifique llave</label>
+                        <div class="col-sm-7">
+                            <textarea id="inputKeyV" type="date" class="form-control textarea-read" rows="2"
+                                      >{{llaveServer}}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label text-right">Código de control</label>
+                        <div class="col-sm-7">
+                            <label class="form-control">{{ controlCode }}</label>
+                        </div>
+                    </div>
+                </form>
+                <div class="text-center">
+                    <button type="button" class="btn btn-outline-info" (click)="getTestControlCode()">Generar código de control</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

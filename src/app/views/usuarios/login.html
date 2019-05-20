@@ -1,0 +1,30 @@
+<div class="row justify-content-md-center">
+    <div class="col-3 pt-5 pb-5 mt-5" style="box-shadow: inset 0 0 5px 0px black;">
+        <!--<h1>{{titulo}}</h1>-->
+        <form #loginForm (ngSubmit)="onSubmit()">
+            <p>
+                <label>Nombre de Usuario</label>
+                <input type="text" name="usuario" class="form-control" required autocomplete="off"
+                       #usuario="ngModel"
+                       [(ngModel)]="cuenta.usuario"
+                       [ngClass]="{'is-invalid': usuario.invalid && usuario.touched}"
+                >
+                <span [ngClass]="{'hidden': !(usuario.invalid && usuario.touched) }" class="badge badge-danger">
+                Nombre de Usuario es obligatorio
+            </span>
+            </p>
+            <p>
+                <label>Contraseña</label>
+                <input type="password" name="password" class="form-control" required
+                       #password="ngModel"
+                       [(ngModel)]="cuenta.contrasenia"
+                       [ngClass]="{'is-invalid': password.invalid && password.touched}"
+                >
+                <span [ngClass]="{'hidden': !(password.invalid && password.touched) }" class="badge badge-danger">
+                Contraseña es obligatorio
+            </span>
+            </p>
+            <button type="submit" class="btn btn-outline-info w-100">Ingresar</button>
+        </form>
+    </div>
+</div>

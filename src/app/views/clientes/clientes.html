@@ -1,0 +1,77 @@
+<div class="sidenav">
+    <div class="nav flex-column nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link active show" id="v-pills-edit-tab" data-toggle="pill" href="#v-pills-edit" role="tab"
+           aria-controls="v-pills-edit" aria-selected="true">
+            <i class="fas fa-edit fa-2x pb-2 pt-2"></i>Editar</a>
+        <a class="nav-link" id="v-pills-cfrecuente-tab" data-toggle="pill" href="#v-pills-cfrecuente" role="tab"
+           aria-controls="v-pills-cfrecuente" aria-selected="true">
+            <i class="fas fa-user-friends fa-2x pb-2 pt-2"></i>Clientes Frecuentes</a>
+    </div>
+</div>
+<div class="main">
+    <div class="tab-content" id="v-pills-tabContent">
+        <!--============================================Tab de Clientes=====================================-->
+        <div class="tab-pane fade active show" id="v-pills-edit" role="tabpanel"
+             aria-labelledby="v-pills-edit-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4">Editar</h3>
+                <div class="col-lg-8 offset-2">
+                    <label>Cliente</label>
+                    <!--style="flex: 1 1 auto;width: 1%;"-->
+                    <app-suggestions
+                                     [inputValue]="persona.nombre"
+                                     (selectedSuggestionEmitter)="getSuggestedClient($event)"
+                    ></app-suggestions>
+                </div>
+                <div class="col-md-12">
+                    <fieldset [disabled]="!persona || !persona.id">
+                    <form-persona [persona]="persona" [modeEdit]="true" [rol]="'c'" (onSubmitEmitter)="disableForm($event)"></form-persona>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="v-pills-cfrecuente" role="tabpanel"
+             aria-labelledby="v-pills-cfrecuente-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4">Clientes frecuentes</h3>
+                <div class="col-md-8 offset-md-2">
+                    <div class="form-row">
+                        <div class="col">
+                            <label for="dateStart">Fecha Inicio</label>
+                            <input (change)="selectedDate($event,1)" type="date" class="form-control pb-1" id="dateStart"
+                                   [ngModel]="searchClient.initialDate">
+                        </div>
+                        <div class="col">
+                            <label for="dateEnd">Fecha Fin</label>
+                            <input (change)="selectedDate($event,2)" type="date" class="form-control pb-1" id="dateEnd"
+                                   [(ngModel)]="searchClient.endDate"
+                                   name="date-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                        <tr>
+                            <th scope="col">Nit o CI</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Teléfono</th>
+                            <th scope="col">Dirección</th>
+                            <th scope="col">Total en compras</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let client of frequentClients">
+                            <td>{{ client.ci}}</td>
+                            <td>{{ client.nombre}}</td>
+                            <td>{{ client.telefono}}</td>
+                            <td>{{ client.direccion}}</td>
+                            <td>{{ client.total_compras}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

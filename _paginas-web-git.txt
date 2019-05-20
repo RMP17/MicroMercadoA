@@ -1,0 +1,6 @@
+https://github.com/Cordobo/angularx-qrcode
+-------------------------------------------------------------------
+------------------------ export Excel------------------------------
+https://github.com/SheetJS/js-xlsx/blob/master/demos/angular2/src/app/sheetjs.component.ts
+------------------------ icons free ------------------------------
+https://fontawesome.com/

@@ -1,0 +1,754 @@
+<div class="sidenav">
+    <div class="nav flex-column nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+        <a class="nav-link active show" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-vender" role="tab"
+           aria-controls="v-pills-vender" aria-selected="true">
+            <i class="fas fa-money-bill-wave fa-2x pb-2 pt-2"></i>Vender</a>
+        <a class="nav-link" id="v-pills-view-tab" data-toggle="pill" href="#v-pills-ver-ventas" role="tab"
+           aria-controls="v-pills-comprar" aria-selected="true">
+            <i class="oi oi-eye fa-2x pb-2 pt-2"></i>Ventas</a>
+        <a class="nav-link" id="v-pills-creditos-tab" data-toggle="pill" href="#v-pills-creditos" role="tab"
+           aria-controls="v-pills-compras" aria-selected="false">
+            <i class="fas fa-money-bill-wave fa-2x pb-2 pt-2"></i>Créditos</a>
+        <a class="nav-link" id="v-pills-invoice-lower-sales-tab" data-toggle="pill" href="#v-pills-invoice-lower-sales" role="tab"
+           aria-controls="v-pills-invoice-lower-sales" aria-selected="false">
+            <i class="fas fa-file-invoice fa-2x pb-2 pt-2"></i>Facturas Ventas M.</a>
+    </div>
+</div>
+<div class="main">
+    <div class="tab-content" id="v-pills-tabContent">
+        <!--============================================Tab de Clientes=====================================-->
+        <div class="tab-pane fade active show" id="v-pills-vender" role="tabpanel"
+             aria-labelledby="v-pills-vender-tab">
+            <div class="col-md-12 ">
+                <div class="row mb-4" style="overflow: hidden;">
+                    <div class="col-auto">
+                        <div class="windows-container">
+                            <div class="windows-h2">
+                                <h3>{{ titulo }}</h3>
+                            </div>
+                            <div *ngFor="let sales of salesInLocalStorage.sales; let index = index"
+                                 class="windows-item" (click)="selectSale(sales)"
+                                 [ngClass]="{'tab-active': sales.id === currentTab}"
+                            >{{ sales.id }}
+                                <a href class="ml-5" appClickStopPropagation
+                                   (dblclick)="closeTab(index)"><i class="fas fa-times"></i></a></div>
+                            <div class="windows-item-plus">
+                                <a href (click)="newTab()"><i class="fas fa-plus-square fa-2x"></i></a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <!--<span class="alert alert-success" role="alert" [ngClass]="{'hidden':!existPersona?.id}">
+                        {{ existPersona?.id ? existPersona.nombre:'-' }} Esta Registrado.
+                    </span>-->
+                    <div class="input-group mb-3">
+                        <input (blur)="searchPersona()" type="text" class="form-control" placeholder="CI o NIT"
+                               [(ngModel)]="persona.ci" name="ci"
+                        >
+                        <!--<input type="text" class="form-control" placeholder="Nombre"
+                               [(ngModel)]="persona.nombre" name="nombre" autocomplete='given-name'
+                        >-->
+                        <app-suggestions style="flex: 1 1 auto;width: 1%;" *ngIf="!refreshAutocomplete"
+                                         [inputValue]="persona"
+                                         [inputPlaceholder]="'Nombre del Cliente'"
+                                         (selectedSuggestionEmitter)="getSuggestedClient($event)"
+                        ></app-suggestions>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <span [ngClass]="{'hidden': !persona.id}" style="color: limegreen; font-size:20px; top: 0px;"
+                                      class="oi oi-check"
+                                >
+                                </span>
+                            </span>
+                        </div>
+                        <div class="input-group-prepend">
+                            <a class="btn btn-info" data-toggle="modal" data-target="#clienteModal" href="javascript:void(0);">
+                                <span class="oi oi-plus text-white"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div *ngIf="!refreshCompraVenta">
+                        <app-compras-ventas [actividad]="'v'"
+                                            [persona]="persona?.id"
+                                            [getVenta]="selectedSale"
+                                            (eventChangeSales)="storeLocally()"
+                                            (eventMakeSale)="printVenta($event)"
+                        ></app-compras-ventas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Clientes=====================================-->
+        <div class="tab-pane fade" id="v-pills-ver-ventas" role="tabpanel"
+             aria-labelledby="v-pills-ver-ventas-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4">Ventas</h3>
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="col-2">
+                            <label for="dateStart">Fecha Inicio</label>
+                            <input (change)="selectedDate($event,1)" type="date" class="form-control pb-1" id="dateStart"
+                                   [ngModel]="searchCompra.date1">
+                        </div>
+                        <div class="col-2">
+                            <label for="dateEnd" >Fecha Fin</label>
+                            <input (change)="selectedDate($event,2)" type="date" class="form-control pb-1" id="dateEnd"
+                                   [ngModel]="searchCompra.date2"></div>
+                        <div class="col-2">
+                            <label for="dateEnd">Numero de factura</label>
+                            <input numberPositive type="text" class="form-control"
+                                   [(ngModel)]="dataToFilter.nro_factura"
+                                   (input)="filter()"
+                            >
+                        </div>
+                        <div class="col-2">
+                            <label for="dateEnd" >Ver</label>
+                            <select class="custom-select" (change)="filter()" [(ngModel)]="dataToFilter.venta_menor" *ngIf="!dataToFilter.nro_factura; else inputDisabled">
+                                <option selected value="1">Todas las ventas</option>
+                                <option value="2">Ventas Menores</option>
+                            </select></div>
+                        <div class="col-2">
+                            <label for="dateEnd">Empleado</label>
+                            <!--<input autocompleteSuggestion [config]="configEmpleados" [items]="empleados" *ngIf="!dataToFilter.nro_factura; else inputDisabled"
+                                   id="input-empleado"
+                                   (selectEvent)="setEmpleadoId($event)"
+                                   placeholder="Nombre del Empleado"
+                            >-->
+                            <app-suggestions-local [config]="configEmpleados" *ngIf="!dataToFilter.nro_factura; else inputDisabled"
+                                                   [data]="empleados"
+                                                   (selectedSuggestionEvent)="setEmpleadoId($event)"
+                            ></app-suggestions-local>
+                        </div>
+                        <div class="col-2">
+                            <label for="dateEnd">Cliente</label>
+                            <app-suggestions style="flex: 1 1 auto;width: 1%;" *ngIf="!dataToFilter.nro_factura; else inputDisabled"
+                                             (selectedSuggestionEmitter)="setClient($event)"
+                            ></app-suggestions>
+                        </div>
+                        <ng-template #inputDisabled>
+                            <input type="text" disabled class="form-control">
+                        </ng-template>
+                    </div>
+                    <div class="row pt-3">
+                        <div class="col-md-12 pb-4">
+                            <h5 *ngIf="this.toggleSeeSales" class="text-center">Total en Ventas:
+                                {{ totalVentas | number: '0.2-2' }}
+                                IVA: {{ totalVentas * 0.13 | number: '0.2-2' }}</h5>
+                            <h5 *ngIf="!this.toggleSeeSales" class="text-center">Total en Ventas Menores:
+                                {{ totalVentasMenores | number: '0.2-2' }}
+                                IVA: {{ totalVentasMenores * 0.13 | number: '0.2-2' }}</h5>
+                            <div class="d-flex justify-content-end">
+                                <a *ngIf="this.toggleSeeSales" title="Ver Ventas Menores Detalle" class="mr-2" (click)="this.toggleSeeSales = !this.toggleSeeSales"
+                                   href="javascript:void(0);" role="button">
+                                    VM<i class="fas fa-eye"></i> <!--VM = ventas menores-->
+                                </a>
+                                <a *ngIf="!this.toggleSeeSales" title="Ver Ventas Generales" class="mr-2" (click)="this.toggleSeeSales = !this.toggleSeeSales"
+                                   href="javascript:void(0);" role="button">
+                                    VG<i class="fas fa-eye"></i> <!--VG = ventas generales-->
+                                </a>
+                                <a title="Exportar a excel" href="javascript:void(0);" role="button"
+                                   data-toggle="modal" data-target="#exportModal">
+                                    <i class="fas fa-file-export"></i>
+                                </a>
+                            </div>
+                            <table *ngIf="this.toggleSeeSales" class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Empleado</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Tipo</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Descuento</th>
+                                    <th scope="col">Nulo</th>
+                                    <th scope="col">N° Factura</th>
+                                    <th scope="col">Detalles</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                                </thead>
+                                <tbody *ngIf="filteredDataForSale.length < 1000">
+                                <tr *ngFor="let venta of filteredDataForSale" [ngClass]="{'alert alert-warning': venta.nulo}">
+                                    <td>{{ venta.empleado}}</td>
+                                    <td>{{ venta.cliente.nombre}}</td>
+                                    <td>{{ venta.fecha_hora}}</td>
+                                    <td>
+                                        <span *ngIf="venta.tipo === 'co'">Contado</span>
+                                        <span *ngIf="venta.tipo === 'cr'">Crédito</span>
+                                    </td>
+                                    <td>{{ venta.total}}</td>
+                                    <td>{{ venta.descuento}}</td>
+                                    <td>{{ venta.nulo ? 'Si':'No'}}</td>
+                                    <td>{{ venta.factura ? venta.factura.nro_factura:''}}</td>
+                                    <td>
+                                        <a title="Productos" class="mr-2" href="javascript:void(0);" (click)="showDetalles(venta.detalle, venta.total, venta.descuento)"
+                                           data-toggle="modal" data-target="#detallesModal">
+                                            <span class="oi oi-eye"></span></a>
+                                        <a [ngClass]="{'disabled': !venta.pagos.length > 0}" class="mr-2" title="Cuotas" href="javascript:void(0);" (click)="showCuotas(venta.pagos)"
+                                           data-toggle="modal" data-target="#cuotasModal"
+                                           [tabindex]="!venta.pagos.length > 0 ? -1:0"
+                                        ><span class="oi oi-dollar" style="top: -0.05rem !important;"></span></a>
+                                        <a [ngClass]="{'disabled': !venta.factura}" title="Factura" href="javascript:void(0);" (click)="showFactura(venta.factura)"
+                                           data-toggle="modal" data-target="#facturaModal"
+                                           [tabindex]="!venta.factura > 0 ? -1:0"
+                                        ><span class="oi oi-document"></span></a><!--(click)="showDetalles(venta.detalle, venta.total, venta.descuento)"-->
+                                    </td>
+                                    <td>
+                                        <a [ngClass]="{'disabled': !venta.factura}" title="Imprimir factura" href
+                                           class="mr-2"
+                                           (click)="printerCompraVenta(venta)"
+                                           [tabindex]="!venta.factura ? -1:0"
+                                        ><span class="oi oi-print"></span></a>
+                                        <a [ngClass]="{'disabled': venta.nulo || venta.factura || venta.venta_menor}" title="Agregar factura" href="javascript:void(0);"
+                                           class="mr-2"
+                                           data-toggle="modal" data-target="#modalAddInvoice"
+                                           (click)="getVentaCompra(venta)"
+                                           [tabindex]="venta.nulo || venta.factura || venta.venta_menor ? -1:0"
+                                        ><span class="oi oi-plus"></span></a>
+                                        <a [ngClass]="{'disabled': venta.nulo}" title="Anular venta y factura" href="javascript:void(0);"
+                                           data-toggle="modal" data-target="#modalAnularVenta" class="mr-2"
+                                           (click)="getVentaCompra(venta)"
+                                           [tabindex]="venta.nulo ? -1:0"
+                                        ><span class="oi oi-ban"></span></a>
+                                        <a [ngClass]="{'disabled': !venta.factura || venta.factura.nulo}" title="Anular factura" href="javascript:void(0);"
+                                           data-toggle="modal" data-target="#modalCancelInvoice" class="mr-2"
+                                           (click)="getVentaCompra(venta)"
+                                           [tabindex]="!venta.factura || venta.factura.nulo ? -1:0"
+                                        ><span class="oi oi-ban"></span></a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <table *ngIf="!this.toggleSeeSales" class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Empleado</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Precio</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Subtotal</th>
+                                </tr>
+                                </thead>
+                                <tbody *ngIf="filteredDataForSale.length < 1000">
+                                <tr *ngFor="let saleDetail of detailMinorSales" [ngClass]="{'alert alert-warning': saleDetail.nulo}">
+                                    <td>{{ saleDetail.empleado}}</td>
+                                    <td>{{ saleDetail.fecha_hora}}</td>
+                                    <td>{{ saleDetail.descripcion}}</td>
+                                    <td>{{ saleDetail.precio_unitario}}</td>
+                                    <td>{{ saleDetail.cantidad}}</td>
+                                    <td>{{ saleDetail.precio_unitario * saleDetail.cantidad | number:'0.2-2'}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Creditos=====================================-->
+        <div class="tab-pane fade" id="v-pills-creditos" role="tabpanel"
+             aria-labelledby="v-pills-ver-creditos-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4"> Ventas Al Crédito</h3>
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="col">
+                            <app-suggestions style="flex: 1 1 auto;width: 1%;" *ngIf="!refreshAutocomplete" [inputPlaceholder]="'Nombre del cliente'"
+                                             (selectedSuggestionEmitter)="setPersonaDeudor($event)"
+                            ></app-suggestions>
+                        </div>
+                        <div class="col">
+                            <input numberFloat type="number" min="0" class="form-control" [(ngModel)]="credito.cuota"
+                                   [ngClass]="{'is-invalid': !credito.cuota }" (keydown.enter)="submitPago()"
+                                   placeholder="Monto"
+                            >
+                        </div>
+                        <div class="pl-1">
+                            <button class="btn btn-outline-info" title="button" (click)="submitPago()" [disabled]="!credito.cuota || !credito.deudor_id">Realizar pago</button>
+                            <button class="btn btn-info" title="button" (click)="onClickGetCredits()">Ver todos los créditos</button>
+                        </div>
+                    </div>
+                    <div class="row pt-3">
+                        <div class="col-md-12 pb-4">
+                            <h5 class="text-center">Total por pagar: {{ credito.totalPagar | number:'0.0-2' }}  Cambio: {{ credito.cambio }}</h5>
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Empleado</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Tipo de compra</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Descuento</th>
+                                    <th scope="col">Cuotas</th>
+                                    <th scope="col">Detalles</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let credito of creditos">
+                                    <td>{{ credito.empleado}}</td>
+                                    <td>{{ credito.cliente.nombre}}</td>
+                                    <td>{{ credito.fecha_hora}}</td>
+                                    <td>
+                                        <span *ngIf="credito.tipo === 'co'">Contado</span>
+                                        <span *ngIf="credito.tipo === 'cr'">Crédito</span>
+                                    </td>
+                                    <td>{{ credito.total}}</td>
+                                    <td>{{ credito.descuento}}</td>
+                                    <td>{{ credito.cuotas}}</td>
+                                    <td>
+                                        <a title="Ver" href="javascript:void(0);" (click)="showDetalles(credito.detalle, credito.total, credito.descuento)" class="mr-2"
+                                           data-toggle="modal" data-target="#detallesModal">
+                                            <span class="oi oi-eye" style="top: 0.2rem !important;"></span></a>
+                                        <a [ngClass]="{'disabled': !credito.pagos.length > 0}" class="mr-2" title="Cuotas"
+                                           href="javascript:void(0);"
+                                           (click)="showCuotas(credito.pagos)"
+                                           data-toggle="modal" data-target="#cuotasModal"
+                                           [tabindex]="!credito.pagos.length > 0 ? -1:0"><span class="oi oi-dollar"></span></a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Facturas Ventas Menores=====================================-->
+        <div class="tab-pane fade" id="v-pills-invoice-lower-sales" role="tabpanel"
+             aria-labelledby="v-pills-ver-creditos-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4"> Facturas ventas menores</h3>
+                <div class="col-md-12">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input type="date" class="form-control" id="date-generate"
+                                   [(ngModel)]="dateForGenerateInvoive">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <button class="btn btn-outline-info w-100" data-toggle="modal"
+                                    data-target="#modalGenerateinvoice">Generar factura</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="dateStart">Fecha Inicio</label>
+                            <input (change)="selectDateMinorSalesInvoice($event,1)" type="date" class="form-control pb-1" id="dateStart-invoice"
+                                   [(ngModel)]="datesToGetMinorSalesInvoice.date1">
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="dateEnd" >Fecha Fin</label>
+                            <input (change)="selectDateMinorSalesInvoice($event,2)" type="date" class="form-control pb-1" id="dateEnd-invoice"
+                                   [(ngModel)]="datesToGetMinorSalesInvoice.date2">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label class="hidden">-</label>
+                            <button type="button" class="btn btn-outline-info w-100"
+                                    (click)="getLowerSalesInvoice()">Consultar</button>
+                        </div>
+
+                    </div>
+                    <div class="col-12">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">N° Factura</th>
+                                <th scope="col">N° Autorización</th>
+                                <th scope="col">Código de control</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Descuento</th>
+                                <th scope="col">Nulo</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody *ngIf="lowerSalesInvoice.length < 1000">
+                            <tr *ngFor="let invoice of lowerSalesInvoice" [ngClass]="{'alert alert-warning': invoice.nulo}">
+                                <td>{{ invoice.nro_factura}}</td>
+                                <td>{{ invoice.nro_autorizacion}}</td>
+                                <td>{{ invoice.codigo_control}}</td>
+                                <td>{{ invoice.fecha}}</td>
+                                <td>{{ invoice.total}}</td>
+                                <td>{{ invoice.descuento}}</td>
+                                <td>{{ invoice.nulo ? 'Si':'No'}}</td>
+                                <td>
+                                    <a title="Detalles" data-toggle="modal"
+                                       data-target="#detailLowerSales" href (click)="getDetailOfLowerSales(invoice.id)"
+                                       class="mr-2"><i class="fas fa-eye"></i></a>
+                                    <a title="Imprimir factura" href (click)="printlowerSalesInvoice(invoice)"
+                                       class="mr-2"><i class="fas fa-print"></i></a>
+                                    <a title="Anular factura" data-toggle="modal"
+                                       data-target="#modalCancelMinorSalesInvoice" href (click)="setUpdateLowerSalesInvoice(invoice)"
+                                       class="mr-2"><i class="fas fa-ban"></i></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="col-12 text-center">
+                         <button class="btn btn-outline-info m-1 w-50" (click)="expotVentas()">
+                             <span class="oi oi-data-transfer-download "></span> Exportar Ventas</button>
+                     </div>
+                     <div class="col-12 text-center">
+                         <button class="btn btn-outline-info m-1 w-50" (click)="expotVentasMenores()">
+                             <span class="oi oi-data-transfer-download"></span> Exportar Ventas Menores</button>
+                     </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--===============================================Modal New Client===============================================-->
+<div class="modal fade" id="clienteModal" tabindex="-1" role="dialog" aria-labelledby="clienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clienteModalLabel">Nuevo Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form-persona [rol]="'c'"
+                              (personaIdEmitter)="setClientAndRefreshClients($event)"
+                >
+                </form-persona>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Detalles===============================================-->
+<div class="modal fade" id="detallesModal" tabindex="-1" role="dialog" aria-labelledby="detallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detallesModalLabel">Detalles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table *ngIf="detalles"  class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let detalle of detalles">
+                        <td>{{ detalle.descripcion}}</td>
+                        <td>{{ detalle.cantidad+' '+detalle.tipo_unidad}}</td>
+                        <td>{{ detalle.precio_unitario}}</td>
+                        <td>{{ detalle.precio_unitario * detalle.cantidad | number:'0.2-2'}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="float-right">
+                    <h6>Total: {{total}}</h6>
+                    <h6>Descuento: {{ descuento }}</h6>
+                    <h6 >Total Con Descuento: {{ total - descuento | number:'0.2-2'}}</h6>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Factura===============================================-->
+<div class="modal fade" id="facturaModal" tabindex="-1" role="dialog" aria-labelledby="facturaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="facturaModalLabel">Factura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-6 text-right p-0"><strong>Factura N° : </strong></div>
+                            <div class="col-6 pl-1"><span>{{dataFactura.nro_factura}}</span></div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-6 text-right p-0"><strong>Autorización N° : </strong></div>
+                            <div class="col-6 pl-1"><span>{{dataFactura.nro_autorizacion}}</span></div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-6 text-right p-0"><strong>Código de control : </strong></div>
+                            <div class="col-6 pl-1"><span>{{dataFactura.codigo_control}}</span></div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-6 text-right p-0"><strong>Nulo :</strong></div>
+                            <div class="col-6 pl-1"><span>{{dataFactura.nulo ? 'Si':'No'}}</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Modal Confirmar Anular Venta=====================================================-->
+<div class="modal fade" id="modalAnularVenta" tabindex="-1" role="dialog" aria-labelledby="modalAnularVenta" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning" >
+                <h5 class="modal-title" id="modalTitleAnularVenta">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea anular la venta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" (click)="cancelSale()">&nbsp; SI &nbsp;</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" >&nbsp; NO &nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalCancelInvoice" tabindex="-1" role="dialog" aria-labelledby="modalCancelInvoice" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning" >
+                <h5 class="modal-title" id="modalTitleCancelInvoice">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea anular la factura?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" (click)="cancelInvoice()">&nbsp; SI &nbsp;</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" >&nbsp; NO &nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalAddInvoice" tabindex="-1" role="dialog" aria-labelledby="modalmodalAddInvoice" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" >
+                <h5 class="modal-title" id="modalTitlemodalAddInvoice">Agregar factura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" >
+                <form  #formFactura="ngForm" id="form-factura" (submit)="addInvoice()">
+                    <div class="form-group">
+                        <label for="inputNroFactura">Nro de la factura
+                            <span class="badge badge-danger" *ngIf="!nroFactura.valid && nroFactura.touched">requerido.</span>
+                        </label>
+                        <input type="text" #nroFactura="ngModel"
+                               id="inputNroFactura"
+                               class="form-control"
+                               [ngClass]="{'is-invalid': !nroFactura.valid}"
+                               [(ngModel)]="dataFactura.nro_factura" name="nro-factura"
+                               autofocus
+                               required
+                               maxlength="15"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNroAutorizacion">Nro de la autorización
+                            <span class="badge badge-danger" *ngIf="!nroAutorizacion.valid && nroAutorizacion.touched">requerido.</span>
+                        </label>
+                        <input type="text" #nroAutorizacion="ngModel"
+                               id="inputNroAutorizacion"
+                               class="form-control"
+                               [ngClass]="{'is-invalid': !nroAutorizacion.valid}"
+                               [(ngModel)]="dataFactura.nro_autorizacion" name="nro-autorizacion"
+                               required
+                               maxlength="15"
+                        >
+                    </div>
+                    <div class="text-center col-md-12">
+                        <button (click)="addInvoice()" data-dismiss="modal" type="submit" class="btn btn-outline-info" [disabled]="!formFactura.form.valid">
+                            Registrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--===============================================Modal Cuotas===============================================-->
+<div class="modal fade" id="cuotasModal" tabindex="-1" role="dialog" aria-labelledby="cuotasModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cuotasModalLabel">Cuotas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table *ngIf="dataCuotas"  class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Fecha y hora</th>
+                        <th scope="col">Cuota</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let cuota of dataCuotas">
+                        <td>{{ cuota.fecha_hora}}</td>
+                        <td>{{ cuota.cuota }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Detalles de Ventas menores===============================================-->
+<div class="modal fade" id="detailLowerSales" tabindex="-1" role="dialog" aria-labelledby="detailLowerSalesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailLowerSalesLabel">Detalle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table *ngIf="detailOfLowerSales"  class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let detail of detailOfLowerSales">
+                        <td>{{ detail.descripcion}}</td>
+                        <td>{{ detail.cantidad +' '+detail.tipo_unidad }}</td>
+                        <td>{{ detail.precio_unitario }}</td>
+                        <td>{{ detail.cantidad * detail.precio_unitario | number: '0.2-2'}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Plantilla para factura======================================================-->
+<div>
+    <app-factura [invoice]="invoice"></app-factura>
+</div>
+
+<!--===============================================Modal Export===============================================-->
+<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Exportar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="dateStart">Fecha Inicio</label>
+                        <input (change)="selectedDateForExport($event,1)" type="date" class="form-control pb-1" id="dateStart-export"
+                               [ngModel]="datesToExportSales.date1">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="dateEnd" >Fecha Fin</label>
+                        <input (change)="selectedDateForExport($event,2)" type="date" class="form-control pb-1" id="dateEnd-export"
+                               [ngModel]="datesToExportSales.date2">
+                    </div>
+
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-outline-info m-1 w-50" (click)="expotVentas()">
+                        <span class="oi oi-data-transfer-download "></span> Exportar Ventas</button>
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-outline-info m-1 w-50" (click)="expotVentasMenores()">
+                        <span class="oi oi-data-transfer-download"></span> Exportar Ventas Menores</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Modal Confirmar Generar Factura de ventas menores=====================================================-->
+<div class="modal fade" id="modalGenerateinvoice" tabindex="-1" role="dialog" aria-labelledby="modalGenerateinvoiceLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info" >
+                <h5 class="modal-title" id="modalTitleVenta">Confirmar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea generar la factura?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">&nbsp; NO &nbsp;</button>
+                <button #btmSi type="button" class="btn btn-outline-info" data-dismiss="modal" (click)="generateLowerSalesInvoice()">&nbsp; SI &nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Modal Confirmar Anular Venta=====================================================-->
+<div class="modal fade" id="modalCancelMinorSalesInvoice" tabindex="-1" role="dialog"
+     aria-labelledby="modalCancelMinorSalesInvoiceLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning" >
+                <h5 class="modal-title">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea anular la factura?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" (click)="cancelMinorSalesInvoice()">&nbsp; SI &nbsp;</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" >&nbsp; NO &nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>

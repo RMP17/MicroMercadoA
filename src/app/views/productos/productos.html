@@ -1,0 +1,925 @@
+<div class="sidenav" >
+    <div class="nav flex-column nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical"
+         >
+        <a class="nav-link  active show" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-informacion" role="tab"
+           aria-controls="v-pills-informacion" aria-selected="true">
+            <i class="fas fa-info fa-2x pb-2"></i>Información</a>
+        <a class="nav-link" id="v-pills-nuevo-producto-tab" data-toggle="pill" href="#nuevo-producto" role="tab"
+           aria-controls="v-pills-profile" aria-selected="false">
+            <i class="fas fa-plus fa-2x pb-2 pt-2"></i>Nuevo Producto</a>
+        <a class="nav-link" id="v-pills-marcas-tab" data-toggle="pill" href="#v-pills-marcas" role="tab"
+           aria-controls="v-pills-marcas" aria-selected="false">
+            <i class="fas fa-tag fa-2x pb-2 pt-2"></i>Marcas</a>
+        <a class="nav-link" id="v-pills-proveedores-tab" data-toggle="pill" href="#v-pills-proveedores" role="tab"
+           aria-controls="v-pills-proveedores" aria-selected="false">
+            <i class="fas fa-briefcase fa-2x pb-2 pt-2"></i>Proveedores</a>
+        <a class="nav-link" id="v-pills-categorias-tab" data-toggle="pill" href="#v-pills-categorias" role="tab">
+            <i class="fab fa-microsoft fa-2x pb-2 pt-2"></i>Categorías</a>
+        <a class="nav-link" id="v-pills-control-tab" data-toggle="pill" href="#v-pills-control" role="tab">
+            <i class="fas fa-desktop fa-2x pb-2 pt-2"></i>Control</a>
+    </div>
+</div>
+<div class="main">
+    <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade active show" id="v-pills-informacion" role="tabpanel" aria-labelledby="v-pills-informacion-tab">
+            <div class="col-md-12">
+                <h3 >Información</h3>
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="javascript:void(0);" class="btn btn-info" (click)="viewAllProductosInfo = !viewAllProductosInfo">
+                        <span *ngIf="!viewAllProductosInfo">
+                            Ver productos
+                        </span>
+                        <span *ngIf="viewAllProductosInfo">
+                            Buscar Producto
+                        </span>
+                    </a>
+                </div>
+                <div *ngIf="!viewAllProductosInfo" class="d-flex justify-content-center mb-3">
+                    <div class="col-lg-12">
+                        <div class="input-group">
+                            <div class="col-lg-5">
+                                <input type="text" class="form-control"
+                                       placeholder="Código"
+                                       [(ngModel)]="searchProductoInput" name="search_producto"
+                                       (keyup.enter)="getProducto()"
+                                >
+                            </div>
+                            <div class="col-lg-5">
+                                <!--<input autocompleteSuggestion [config]="configInfoProducto" [items]="productos"
+                                       (inputChangedEvent)="onInputChangedEvent($event)"
+                                       (selectEvent)="onSelectProducto($event)"
+                                       placeholder="Descripción"
+                                >-->
+                                <app-suggestions-local [config]="configInfoProducto"
+                                                       [data]="productos"
+                                                       (selectedSuggestionEvent)="onSelectProducto($event)"
+                                ></app-suggestions-local>
+                                <ng-template #itemTpl let-result class="w-100">
+                                    <div>
+                                        <strong>{{ result.result }}</strong>
+                                    </div>
+                                </ng-template>
+                            </div>
+                            <div class="col-lg-2">
+                                <button class="btn btn-outline-info btn-block" (click)="getProducto()">Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--=========================================Info Poducto============================================-->
+                <div *ngIf="infoProducto && infoProducto.id && !viewAllProductosInfo">
+                    <div class="row">
+                        <div class="col-md-8 offset-1">
+                            <div class="form-control">
+                                <h5 class="text-center">{{ infoProducto.descripcion }}</h5>
+                                <p class="text-center">
+                                    <b>Precio de Compra:</b> {{infoProducto.precio_compra_unidad }}
+                                    <span class="pl-2"><b>Precio de Venta:</b> {{infoProducto.precio_venta_unidad }}</span>
+                                </p>
+                            </div>
+                            <div class="card flex-md-row mb-4 box-shadow">
+                                <img *ngIf="!imgProducto" class="card-img-right flex-auto d-none d-md-block" alt="Img [150x150]"
+                                     style="width: 150px; height: 150px;" data-holder-rendered="true"
+                                     src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_16311ba8dd1%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_16311ba8dd1%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2235.4296875%22%20y%3D%22104.5%22%3E150x150%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+                                <img *ngIf="imgProducto" class="card-img-right flex-auto d-none d-md-block" alt="Img [150x150]"
+                                     style="width: 150px; height: 150px;" data-holder-rendered="true"
+                                     [src]="imgProducto">
+                                <div class="card-body d-flex flex-column align-items-start">
+                                    <h5 class="card-title">Tienda</h5>
+                                    <p class="card-text mb-0">
+                                        Cantidad: {{ infoProducto.stock +' '+infoProducto.tipo_unidad }}
+                                    </p>
+                                    <p class="card-text mb-0">
+                                        Fecha de vencimiento: {{infoProducto.fecha_caducidad }}
+                                    </p>
+                                </div>
+                                <div class="card-body d-flex flex-column align-items-start">
+                                    <h5 class="card-title">Almacen</h5>
+                                    <p class="card-text mb-0">
+                                        Cantidad: {{ infoProducto.cantidad_almacen +' '+infoProducto.tipo_unidad }}
+                                    </p>
+                                    <p class="card-text mb-0">
+                                        <!--Fecha de vencimiento: {{infoProducto.fecha_caducidad }}-->
+                                        Fecha de vencimiento: {{infoProducto.fecha_caducidad_almacen }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mt-5 pt-4">
+                            <div class="d-flex align-items-start flex-column">
+                                <a class="btn" href="javascript:void(0);" data-toggle="modal" data-target="#editModal" (click)="editProducto(infoProducto)">
+                                    <span class="oi oi-pencil size-icons-13"></span>Editar
+                                </a>
+                                <a class="btn" href="javascript:void(0);" (click)="getCodigos(infoProducto.id)" data-toggle="modal" data-target="#codigoModal">
+                                    <span class="oi oi-list bar-code size-icons-13"></span>Códigos
+                                </a>
+                                <a class="btn" href="javascript:void(0);" (click)="getMarcasProducto(infoProducto.id)" data-toggle="modal" data-target="#marcaModal">
+                                    <span class="oi oi-tag size-icons-13"></span>Marcas
+                                </a>
+                                <a class="btn" href="javascript:void(0);" (click)="getProductoCategorias(infoProducto.id)" data-toggle="modal" data-target="#categoriaModal">
+                                    <span class="oi oi-grid-four-up size-icons-13"></span>Categorías
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="viewAllProductosInfo">
+                    <table class="table table-striped table-sm">
+                        <thead class="center">
+                        <tr>
+                            <th scope="col">Códigos</th>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Precio de compra</th>
+                            <th scope="col">Precio de venta</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Fecha de vencimiento</th>
+                            <th scope="col">Cantidad en almacén</th>
+                            <th scope="col">Fecha de vencimiento de almacén</th>
+                        </tr>
+                        </thead>
+                        <tbody class="border">
+                        <tr *ngFor="let producto of productos">
+                            <td>
+                                <span *ngFor="let codigo of producto.codigos">
+                                    {{ codigo.codigo}} <br>
+                                </span>
+                            </td>
+                            <td>{{producto.descripcion}}</td>
+                            <td>{{producto.precio_compra_unidad}}</td>
+                            <td>{{producto.precio_venta_unidad}}</td>
+                            <td>{{producto.stock + ' ' + producto.tipo_unidad}}</td>
+                            <td>{{producto.fecha_caducidad}}</td>
+                            <td>{{producto.cantidad_almacen}}</td>
+                            <td>{{producto.fecha_caducidad_almacen}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Producto=====================================-->
+        <div class="tab-pane fade" id="nuevo-producto" role="tabpanel" aria-labelledby="v-pills-nuevo-producto-tab">
+            <div class="col-12">
+                <h3 class="mb-4">Nuevo Producto</h3>
+                <div>
+                    <form #formProducto="ngForm" (ngSubmit)="onSubmit()" id="form-producto">
+                        <div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="inputTipoUnidad">Proveedor
+                                    </label>
+                                    <!--<input autocompleteSuggestion [config]="configProveedor" [items]="proveedores"
+                                           (inputChangedEvent)="onInputChangedEvent($event)"
+                                           (selectEvent)="onSelectProveedor($event)">-->
+                                    <app-suggestions-local [config]="configProveedor"
+                                                           [data]="proveedores"
+                                                           (selectedSuggestionEvent)="onSelectProveedor($event)"
+                                    ></app-suggestions-local>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Marca</label>
+                                   <!-- <input autocompleteSuggestion [config]="configMarca" [items]="marcas"
+                                           (inputChangedEvent)="onInputChangedEvent($event)"
+                                           (selectEvent)="onSelectMarca($event)">-->
+                                    <app-suggestions-local [config]="configMarca"
+                                                           [data]="marcas"
+                                                           (selectedSuggestionEvent)="onSelectMarca($event)"
+                                    ></app-suggestions-local>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Categoria</label>
+                                    <!--<input autocompleteSuggestion [config]="configCategoria" [items]="categorias"
+                                           (inputChangedEvent)="onInputChangedEvent($event)"
+                                           (selectEvent)="onSelectCategoria($event)">-->
+                                    <app-suggestions-local [config]="configCategoria"
+                                                           [data]="categorias"
+                                                           (selectedSuggestionEvent)="onSelectCategoria($event)"
+                                    ></app-suggestions-local>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputDescripcion">Descripción
+                                    <span class="badge badge-danger" *ngIf="!descripcion.valid && descripcion.touched">
+                                requerido.
+                            </span>
+                                </label>
+                                <input type="text" #descripcion="ngModel"
+                                       id="inputDescripcion"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !descripcion.valid}"
+                                       [(ngModel)]="producto.descripcion" name="descripcion_name"
+                                       placeholder="Descripción"
+                                       #inputDescripcion
+                                       required
+                                       autofocus
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputCodigo">Código
+                                    <span class="badge badge-danger" *ngIf="codigo.invalid && codigo.touched">
+                                requerido.
+                            </span>
+                                </label>
+                                <input type="text" #codigo="ngModel" autocomplete="codigos"
+                                       id="inputCodigo"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !codigo.valid}"
+                                       [(ngModel)]="producto.codigo" name="codigo"
+                                       placeholder="Código"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputImg">Imagen</label>
+                                <div class="custom-file" style="z-index: 0;">
+                                    <input type="file"
+                                           enctype="multipart/form-data"
+                                           id="inputImg"
+                                           class="custom-file-input"
+                                           accept=".jpeg, .png, .jpg, .gif, .svg"
+                                           #inputFile
+                                           (change)="fileChabgeEvent($event)"
+                                    >
+                                    <label for="inputImg" class="custom-file-label">{{filesToUpload?.length > 0 ?
+                                        filesToUpload[0].name:'Imagen'}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputPrecioCompraoUnitario">Precio de Compra por Unidad
+                                    <span class="badge badge-danger"
+                                          *ngIf="precioCompraUnidad.errors?.required && precioCompraUnidad.invalid && precioCompraUnidad.touched">
+                                    requerido.
+                                </span>
+                                    <span class="badge badge-danger" *ngIf="precioCompraUnidad.errors?.pattern">
+                                    debe ser un valor numerico.
+                                </span>
+                                </label>
+                                <input numberFloat type="text" #precioCompraUnidad="ngModel"
+                                       id="inputPrecioCompraoUnitario"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !precioCompraUnidad.valid}"
+                                       [(ngModel)]="producto.precio_compra_unidad" name="precio_compra_unidad"
+                                       placeholder="Precio de Compra por Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputPrecioVentaUnidad">Precio de Venta por Unidad
+                                    <span class="badge badge-danger"
+                                          *ngIf="precioVentaUnidad.errors?.required && precioVentaUnidad.invalid && precioVentaUnidad.touched">
+                                requerido.
+                            </span>
+                                    <span class="badge badge-danger" *ngIf="precioVentaUnidad.errors?.pattern">
+                                debe ser un valor numerico.
+                            </span>
+
+                                </label>
+                                <input numberFloat type="text" #precioVentaUnidad="ngModel"
+                                       id="inputPrecioVentaUnidad"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !precioVentaUnidad.valid}"
+                                       [(ngModel)]="producto.precio_venta_unidad" name="precio_venta_unidad"
+                                       placeholder="Precio de Venta por Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputTipoUnidad">Tipo de Unidad
+                                    <span class="badge badge-danger" *ngIf="!tipoUnidad.valid && tipoUnidad.touched">
+                                requerida.
+                            </span>
+                                </label>
+                                <input type="text" #tipoUnidad="ngModel"
+                                       id="inputTipoUnidad"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !tipoUnidad.valid}"
+                                       [(ngModel)]="producto.tipo_unidad" name="tipo_unidad"
+                                       placeholder="Tipo de Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputCantadad">Cantidad
+                                    <span class="badge badge-danger" *ngIf="cantidad.errors?.pattern">
+                                debe ser un valor numérico entero.
+                            </span>
+                                </label>
+                                <input numberPositive type="text" #cantidad="ngModel"
+                                       id="inputCantadad"
+                                       class="form-control"
+                                       [(ngModel)]="producto.stock" name="cantidad"
+                                       placeholder="Cantidad"
+                                       pattern="[0-9]*"
+                                >
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputFechaCaducidad">Fecha de Vencimiento
+                                </label>
+                                <input title="Formato: AAAA-MM-DD" type="date" #newFechaCaducidad="ngModel"
+                                       id="inputFechaCaducidad"
+                                       class="form-control"
+                                       [(ngModel)]="producto.fecha_caducidad" name="fecha_caducidad"
+                                       placeholder="Formato: Año-Mes-Día"
+                                >
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputCantidadAlmacen">Cantidad en Almacén
+                                    <span class="badge badge-danger" *ngIf="cantidadAlmacen.errors?.pattern">
+                             debe ser un valor numérico entero.
+                            </span>
+                                </label>
+                                <input numberPositive type="text" #cantidadAlmacen="ngModel"
+                                       id="inputNewCantidadAlmacen"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !cantidadAlmacen.valid}"
+                                       [(ngModel)]="producto.cantidad_almacen" name="cantidad_almacen"
+                                       placeholder="Cantidad en Almacén"
+                                       pattern="[0-9]*"
+                                >
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="inputFechaCaducidadAlmacen">Fecha de Caducidad en Almacén
+                                    <span class="badge badge-danger"
+                                          *ngIf="fechaCaducidadAlmacen.errors?.min && fechaCaducidadAlmacen.touched">
+                             debe ser una fecha postorior a hoy
+                            </span>
+                                </label>
+                                <input title="Formato: Año-Mes-Día" type="date" #fechaCaducidadAlmacen="ngModel"
+                                       id="inputNewFechaCaducidadAlmacen"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !fechaCaducidadAlmacen.valid}"
+                                       [(ngModel)]="producto.fecha_caducidad_almacen" name="fecha_caducidad_almacen"
+                                       placeholder="Formato: Año-Mes-Día"
+                                >
+                            </div>
+                            <!--<div class="col-md-3">
+                                <label>
+                                    Destinar
+                                </label>
+                                <div class="form-control ">
+                                    <div class="form-check form-check-inline">
+                                        <input [(ngModel)]="producto.destino" class="form-check-input" type="radio"
+                                               name="radioProductosDestino" id="radioTiendaNewProducto" [value]="true" checked>
+                                        <label class="form-check-label" for="radioTiendaNewProducto">A la Tienda</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input [(ngModel)]="producto.destino" class="form-check-input" type="radio"
+                                               name="radioProductosDestino" id="radioAlmacenNewProducto" [value]="false">
+                                        <label class="form-check-label" for="radioAlmacenNewProducto">Al Almacén</label>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+                        <div *ngIf="!modeEdit" class="text-center">
+                            <button type="submit" class="btn btn-outline-info" [disabled]="!formProducto.form.valid">
+                                Registrar
+                            </button>
+                            <button type="reset" class="btn btn-outline-danger">Limpiar</button>
+                        </div>
+                        <div *ngIf="modeEdit" class="text-center">
+                            <button type="submit" class="btn btn-outline-info" [disabled]="!formProducto.form.valid">
+                                Actualizar
+                            </button>
+                            <button type="reset" class="btn btn-outline-danger" (click)="cancelModeEdit()">Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="v-pills-marcas" role="tabpanel" aria-labelledby="v-pills-narcas-tab">
+            <div class="col-md-12">
+                <marcas (marcasEmitter)="getMarcas($event)"
+                ></marcas>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="v-pills-categorias" role="tabpanel" aria-labelledby="v-pills-categorias-tab">
+            <div class="col-md-12">
+                <categorias (categoriasEmitter)="getCategorias($event)"></categorias>
+            </div>
+        </div>
+        <!--============================================Tab de Proveedores=====================================-->
+        <div class="tab-pane fade" id="v-pills-proveedores" role="tabpanel" aria-labelledby="v-pills-proveedores-tab">
+            <div class="col-md-12">
+                <app-proveedores (registerEmitter)="getProveedoresNameInit()"></app-proveedores>
+            </div>
+        </div>
+        <!--============================================Control de Productos=====================================-->
+        <div class="tab-pane fade" id="v-pills-control" role="tabpanel" aria-labelledby="v-pills-control-tab">
+            <div class="col-md-12">
+               <h3>Control de Productos</h3>
+                <div class="d-flex justify-content-end">
+                    <a href="javascript:void(0);" class="btn btn-info" (click)="setTypeMode()">
+                        <span *ngIf="typeMode">
+                            Productos por Caducar
+                        </span>
+                        <span *ngIf="!typeMode">
+                            Productos con poco stock
+                        </span>
+                    </a>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <a href="javascript:void(0);" class="btn" (click)="setViewAllProductos()">
+                        <span *ngIf="viewAllProductos">
+                            Ocultar
+                            <span class="oi oi-eye size-icons"></span>
+                        </span>
+                        <span *ngIf="!viewAllProductos">
+                            Mostrar ocultos
+                            <span class="oi oi-eye size-icons"></span>
+                        </span>
+                    </a>
+                </div>
+                <div *ngIf="!typeMode" class="row">
+                    <div class="col-md-12">
+                        <h3 class="text-center">Productos por caducar</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="text-center">Tienda</h3>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Fecha de Vencimiento</th>
+                                <th scope="col">Notificar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <ng-container *ngIf="productos">
+                                <tr *ngFor="let producto of productosPorCaducar()">
+                                    <td>{{ producto.descripcion}}</td>
+                                    <td>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input #fieldFechaCaducidad type="date"
+                                                   id="fieldUpdateFecha-caducidad"
+                                                   class="form-control" name="update-fecha-caducidad"
+                                                   placeholder="Fecha de Vencimiento"
+                                                   [value]="producto.fecha_caducidad"
+                                            >
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-outline-info" type="button"
+                                                        (click)="updateFechaVencimiento(fieldFechaCaducidad, producto)">
+                                                    Actualizar
+                                                </button>
+                                                <button class="btn btn-outline-danger" type="button"
+                                                        (click)="cancelFechaVencimientoUpdate(fieldFechaCaducidad, producto)">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="custom-control custom-checkbox pl-0">
+                                            <input type="checkbox" class="custom-control-input"
+                                                   [value]="producto.notificar"
+                                                   [checked]="producto.notificar"
+                                                   id="{{ 'check'+producto.id}}" (change)="notify($event, producto)"
+                                            >
+                                            <label class="custom-control-label" for="{{ 'check'+producto.id}}">{{ producto.notificar ? 'Si': 'No'}}</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="text-center">Almacén</h3>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Fecha de Vencimiento</th>
+                                <th scope="col">Notificar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <ng-container *ngIf="productos">
+                                <tr *ngFor="let producto of productosPorCaducarAlmacen()">
+                                    <td>{{ producto.descripcion}}</td>
+                                    <td>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input #fieldFechaCaducidadAlmacen type="date"
+                                                   id="fieldUpdateFecha-caducidad-almacen"
+                                                   class="form-control" name="update-fecha-caducidad-almacen"
+                                                   placeholder="Fecha de Vencimiento"
+                                                   [value]="producto.fecha_caducidad_almacen"
+                                            >
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-outline-info" type="button"
+                                                        (click)="updateFechaVencimientoAlmacen(fieldFechaCaducidadAlmacen, producto)">
+                                                    Actualizar
+                                                </button>
+                                                <button class="btn btn-outline-danger" type="button"
+                                                        (click)="cancelFechaVencimientoUpdateAlmacen(fieldFechaCaducidadAlmacen, producto)">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="custom-control custom-checkbox pl-0">
+                                            <input type="checkbox" class="custom-control-input"
+                                                   [value]="producto.notificar_fecha_caducidad"
+                                                   [checked]="producto.notificar_fecha_caducidad"
+                                                   id="{{ 'checkAlmacen'+producto.id}}" (change)="notifyAlmacen($event, producto)"
+                                            >
+                                            <label class="custom-control-label" for="{{ 'checkAlmacen'+producto.id}}">{{ producto.notificar_fecha_caducidad ? 'Si': 'No'}}</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div *ngIf="typeMode">
+                    <h3 class="text-center">Productos con poco stock</h3>
+                    <form #formEditFechaCeducidad="ngForm" (ngSubmit)="onSubmit()" id="form-edi-fecha-caducidad" >
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Cantidad Tienda</th>
+                                <th scope="col">Cantidad Almacen</th>
+                                <th scope="col">Acciones</th>
+                                <th scope="col">Proveedores</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <ng-container *ngIf="productos">
+                                <tr *ngFor="let producto of stockProductos()">
+                                    <td>{{ producto.descripcion}}</td>
+                                    <td>{{ producto.stock}}</td>
+                                    <td>{{ producto.cantidad_almacen}}</td>
+                                    <td>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input numberPositive #fieldCantidad type="number"
+                                                   class="form-control"
+                                                   placeholder="Cantidad" name="cantidad"
+                                                   min="0" step="1"
+                                                   [value]="0"
+                                            >
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-outline-info" type="button"
+                                                        (click)="toTransfer(fieldCantidad, producto)">
+                                                    Transferir a la Tienda
+                                                </button>
+                                                <button class="btn btn-outline-danger" type="button"
+                                                        (click)="cancelToTransfer(fieldCantidad, producto)">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0);" (click)="getProveedoresPorProducto(producto.id)"
+                                           data-toggle="modal" data-target="#proveedoresModal"
+                                        >Ver</a>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--===============================================Modal Codigo===============================================-->
+<div class="modal fade" id="codigoModal" tabindex="-1" role="dialog" aria-labelledby="codigoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="codigoModalLabel">Códigos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #formCodigo="ngForm" (ngSubmit)="onSubmitCodigo()" id="form-codigo" >
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="input-codigo-only"
+                               name="codigo"
+                               placeholder="Código" aria-label="Recipient's codigos"
+                               [(ngModel)]="newCodigo.codigo"
+                               required
+                        >
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-outline-info">Agregar Código</button>
+                        </div>
+                    </div>
+                </form>
+                <ul class="list-group list-group-flush" *ngIf="codigos">
+                    <li class="list-group-item" *ngFor="let codigo of codigos">
+                        <a title="Eliminar" href="javascript:void(0);" (click)="deleteCodigo(codigo.id)"><span class="oi oi-trash"></span></a>
+                        {{ codigo.codigo }}
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Marca===============================================-->
+<div class="modal fade" id="marcaModal" tabindex="-1" role="dialog" aria-labelledby="marcaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="marcaModalLabel">Marcas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #formCodigo="ngForm" id="form-marca-producto" >
+                    <app-suggestions-local [config]="configMarca"
+                                           [data]="marcas"
+                                           (selectedSuggestionEvent)="onSelectProductoMarcas($event)"
+                    ></app-suggestions-local>
+                </form>
+                <ul class="list-group list-group-flush" *ngIf="productoMarcas">
+                    <li class="list-group-item" *ngFor="let marca of productoMarcas">
+                        <a title="Eliminar" href="javascript:void(0);" (click)="deleteProductoMarcas(marca.id)"><span class="oi oi-trash"></span></a>
+                        {{ marca.nombre }}
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Categorias===============================================-->
+<div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoriaModalLabel">Categorías</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #formCodigo="ngForm" id="form-categoria-producto" >
+                    <app-suggestions-local [config]="configCategoria"
+                                           [data]="categorias"
+                                           (selectedSuggestionEvent)="onSelectProductoCategorias($event)"
+                    ></app-suggestions-local>
+                </form>
+                <ul class="list-group list-group-flush" *ngIf="productoCategorias">
+                    <li class="list-group-item" *ngFor="let categoria of productoCategorias">
+                        <a title="Eliminar" href="javascript:void(0);" (click)="deleteProductoCategorias(categoria.id)"><span class="oi oi-trash"></span></a>
+                        {{ categoria.descripcion }}
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Edit===============================================-->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edición</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="_producto">
+                    <form #formProducto="ngForm" (ngSubmit)="onSubmitEditedProdcuto()" id="edit-form-producto">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputEditDescripcion">Descripción
+                                    <span class="badge badge-danger" *ngIf="!descripcion.valid && descripcion.touched">
+                                requerido.
+                            </span>
+                                </label>
+                                <input type="text" #descripcion="ngModel"
+                                       id="inputEditDescripcion"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !descripcion.valid}"
+                                       [(ngModel)]="_producto.descripcion" name="descripcion"
+                                       placeholder="Descripción"
+                                       #inputDescripcion
+                                       required
+                                       autofocus
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputImg">Imagen</label>
+                                <div class="custom-file" style="z-index: 0;">
+                                    <input type="file"
+                                           enctype="multipart/form-data"
+                                           id="inputEditImg"
+                                           class="custom-file-input"
+                                           accept=".jpeg, .png, .jpg, .gif, .svg"
+                                           #inputFile
+                                           (change)="fileChabgeEvent($event)"
+                                    >
+                                    <label for="inputImg" class="custom-file-label">{{filesToUpload?.length > 0 ? filesToUpload[0].name:'Imagen'}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputEditStock">Cantidad
+                                    <span class="badge badge-danger" *ngIf="stock.errors?.required && stock.touched">
+                                requerido.
+                            </span>
+                                    <span class="badge badge-danger" *ngIf="stock.errors?.pattern">
+                                debe ser un valor numérico entero.
+                            </span>
+                                </label>
+                                <input numberPositive type="text" #stock="ngModel"
+                                       id="inputEditStock"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !stock.valid}"
+                                       [(ngModel)]="_producto.stock" name="stock"
+                                       placeholder="Cantidad"
+                                       required
+                                       pattern="[0-9]*"
+                                >
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputPrecioCompra"> Precio de Compra por Unidad
+                                    <span class="badge badge-danger"
+                                          *ngIf="precioCompra.errors?.required && precioCompra.invalid && precioCompra.touched">
+                                requerido.
+                            </span>
+                                    <span class="badge badge-danger" *ngIf="precioCompra.errors?.pattern">
+                                debe ser un valor numerico.
+                            </span>
+
+                                </label>
+                                <input numberFloat type="text" #precioCompra="ngModel"
+                                       id="inputPrecioCompra"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !precioCompra.valid}"
+                                       [(ngModel)]="_producto.precio_compra_unidad" name="precio_compra_unidad"
+                                       placeholder="Precio de Compra por Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputPrecioVenta"> Precio de Venta por Unidad
+                                    <span class="badge badge-danger"
+                                          *ngIf="precioVenta.errors?.required && precioVenta.invalid && precioVenta.touched">
+                                requerido.
+                            </span>
+                                    <span class="badge badge-danger" *ngIf="precioVenta.errors?.pattern">
+                                debe ser un valor numerico.
+                            </span>
+
+                                </label>
+                                <input numberFloat type="text" #precioVenta="ngModel"
+                                       id="inputPrecioVenta"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !precioVenta.valid}"
+                                       [(ngModel)]="_producto.precio_venta_unidad" name="precio_venta_unidad"
+                                       placeholder="Precio de Venta por Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputFechaCaducidad">Fecha de Caducidad
+                                </label>
+                                <input title="Formato: AAAA-MM-DD" type="date" #fechaCaducidad="ngModel"
+                                       id="inputEditFechaCaducidad"
+                                       class="form-control"
+                                       [(ngModel)]="_producto.fecha_caducidad" name="fecha_caducidad"
+                                       placeholder="Formato: Año-Mes-Día"
+                                >
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputTipoUnidad">Tipo de Unidad
+                                    <span class="badge badge-danger" *ngIf="!tipoUnidad.valid && tipoUnidad.touched">
+                                requerida.
+                            </span>
+                                </label>
+                                <input type="text" #tipoUnidad="ngModel"
+                                       id="inputEditTipoUnidad"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !tipoUnidad.valid}"
+                                       [(ngModel)]="_producto.tipo_unidad" name="tipo_unidad"
+                                       placeholder="Tipo de Unidad"
+                                       required
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputCantidadAlmacen">Cantidad en Almacén
+                                    <span class="badge badge-danger" *ngIf="cantidadAlmacen.errors?.pattern">
+                             debe ser un valor numérico entero.
+                            </span>
+                                </label>
+                                <input numberPositive type="text" #cantidadAlmacen="ngModel"
+                                       id="inputCantidadAlmacen"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !cantidadAlmacen.valid}"
+                                       [(ngModel)]="_producto.cantidad_almacen" name="cantidad_almacen"
+                                       placeholder="Cantidad en Almacén"
+                                       pattern="[0-9]*"
+                                >
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputFechaCaducidadAlmacen">Fecha de Caducidad en Almacén
+                                    <span class="badge badge-danger"
+                                          *ngIf="fechaCaducidadAlmacen.errors?.min && fechaCaducidadAlmacen.touched">
+                             debe ser una fecha postorior a hoy
+                            </span>
+                                </label>
+                                <input title="Formato: Año-Mes-Día" type="date" #fechaCaducidadAlmacen="ngModel"
+                                       id="inputFechaCaducidadAlmacen"
+                                       class="form-control"
+                                       [ngClass]="{'is-invalid': !fechaCaducidadAlmacen.valid}"
+                                       [(ngModel)]="_producto.fecha_caducidad_almacen" name="fecha_caducidad_almacen"
+                                       placeholder="Formato: Año-Mes-Día"
+                                >
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-outline-info" [disabled]="!formProducto.form.valid">
+                                Actualizar
+                            </button>
+                            <button type="reset" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Proveedores===============================================-->
+<div class="modal fade" id="proveedoresModal" tabindex="-1" role="dialog" aria-labelledby="proveedoresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="proveedoresModalLabel">Proveedores</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" *ngIf="proveedoresPorProdcuto">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Ci o Nit</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Telefono</th>
+                        <th scope="col">Dirección</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let proveedor of proveedoresPorProdcuto">
+                        <td>{{proveedor.ci}}</td>
+                        <td>{{proveedor.nombre}}</td>
+                        <td>{{proveedor.telefono}}</td>
+                        <td>{{proveedor.direccion}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Edit===============================================-->
+
+<!--
+<div class="d-flex justify-content-end">
+    <a [ngClass]="{'link-diabled': modeEdit}" href="javascript:void(0);" class="btn"
+       (click)="setModeCreate()">
+        <span title="Añadir Marca" *ngIf="!modeCreate" class="oi oi-plus"></span>
+        <span title="Ver Marcas" *ngIf="modeCreate" class="oi oi-eye"></span>
+    </a>
+</div>
+<div>
+    <div *ngIf="!modeCreate; else templateFormProductos">
+        <div *ngIf="infoProducto">
+
+        </div>
+    </div>
+</div>
+-->

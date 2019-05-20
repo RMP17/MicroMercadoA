@@ -1,0 +1,290 @@
+
+<div class="sidenav">
+    <div class="nav flex-column nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link active show" id="v-pills-comprar-tab" data-toggle="pill" href="#v-pills-comprar" role="tab"
+           aria-controls="v-pills-comprar" aria-selected="true">
+            <i class="fas fa-shopping-cart fa-2x pb-2 pt-2"></i>Comprar</a>
+
+        <a class="nav-link" id="v-pills-compras-tab" data-toggle="pill" href="#v-pills-ver-compras" role="tab"
+           aria-controls="v-pills-compras" aria-selected="false">
+            <i class="oi oi-eye fa-2x pb-2 pt-2"></i>Ver Compras</a>
+        <a class="nav-link" id="v-pills-creditos-tab" data-toggle="pill" href="#v-pills-creditos" role="tab"
+           aria-controls="v-pills-compras" aria-selected="false">
+            <i class="fas fa-money-bill-wave fa-2x pb-2 pt-2"></i>Créditos</a>
+    </div>
+</div>
+<div class="main">
+    <div class="tab-content" id="v-pills-tabContentCompras">
+        <!--============================================Tab de Comprar=====================================-->
+        <div class="tab-pane fade active show" id="v-pills-comprar" role="tabpanel"
+             aria-labelledby="v-pills-comprar-tab">
+            <div class="col-md-12">
+                <h3 class="mr-1">{{ titulo }}</h3>
+                <div class="col-lg-12">
+                    <div class="input-group mb-4">
+                        <div class="col-md-6 offset-3 text-center pr-0">
+                            <!--<input *ngIf="!refreshAutocomplete" autocompleteSuggestion [config]="configProveedor" [items]="personas"
+                                   id="input-proveedor"
+                                   (selectEvent)="onSelectProveedor($event)"
+                                   placeholder="Nombre del Proveedor"
+                                   [value]="_persona ? _persona.nombre: ''"
+                            >-->
+                            <app-suggestions-local [config]="configProveedor"
+                                                   [data]="personas"
+                                                   (selectedSuggestionEvent)="onSelectProveedor($event)"
+                            ></app-suggestions-local>
+                        </div>
+                        <div class="input-group-prepend">
+                            <a class="btn btn-info" data-toggle="modal" data-target="#proveedorModal" href="javascript:void(0);">
+                                <span class="oi oi-plus text-white"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <app-compras-ventas [actividad]="'c'" [persona]="_persona?.id"></app-compras-ventas>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Ver Compras=====================================-->
+        <div class="tab-pane fade" id="v-pills-ver-compras" role="tabpanel"
+             aria-labelledby="v-pills-ver-compras-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4"> Ver Compras</h3>
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="col">
+                            <label for="dateStart">Fecha Inicio</label>
+                            <input (change)="selectedDate($event,1)" type="date" class="form-control" id="dateStart"
+                                   [ngModel]="searchCompra.date1">
+                        </div>
+                        <div class="col">
+                            <label for="dateEnd" >Fecha Fin</label>
+                            <input (change)="selectedDate($event,2)" type="date" class="form-control" id="dateEnd"
+                                   [ngModel]="searchCompra.date2"></div>
+                        <div class="col">
+                            <label for="dateEnd">Empleado</label>
+                            <!--<input autocompleteSuggestion [config]="configEmpleados" [items]="empleados"
+                                   id="input-empleado"
+                                   (selectEvent)="setEmpleadoId($event)"
+                                   placeholder="Nombre del Empleado"
+                            >-->
+                            <app-suggestions-local [config]="configEmpleados"
+                                                   [data]="empleados"
+                                                   (selectedSuggestionEvent)="setEmpleadoId($event)"
+                            ></app-suggestions-local>
+                        </div>
+                    </div>
+                    <div class="row pt-3">
+                        <div class="col-md-12 pb-4">
+                            <h5 class="text-center">Total en compras: {{ totalGastos }}</h5>
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Empleado</th>
+                                    <th scope="col">Proveedor</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Tipo de compra</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Descuento</th>
+                                    <th scope="col">Detalles</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let compra of compras">
+                                    <td>{{ compra.empleado}}</td>
+                                    <td>{{ compra.proveedor}}</td>
+                                    <td>{{ compra.fecha_hora}}</td>
+                                    <td>
+                                        <span *ngIf="compra.tipo === 'co'">Contado</span>
+                                        <span *ngIf="compra.tipo === 'cr'">Crédito</span>
+                                    </td>
+                                    <td>{{ compra.total}}</td>
+                                    <td>{{ compra.descuento}}</td>
+                                    <td>
+                                        <a title="Ver" href="javascript:void(0);" (click)="showDetalles(compra.detalle, compra.total, compra.descuento)" class="mr-2"
+                                           data-toggle="modal" data-target="#detallesModal">
+                                            <span class="oi oi-eye" style="top: 0.2rem !important;"></span></a>
+                                        <a [ngClass]="{'disabled': !compra.pagos.length > 0}" title="Cuotas" href="javascript:void(0);" (click)="showCuotas(compra.pagos)"
+                                           data-toggle="modal" data-target="#cuotasModal"
+                                           [tabindex]="!compra.pagos.length > 0 ? -1:0"
+                                        >
+                                            <span class="oi oi-dollar"></span></a><!--(click)="showDetalles(compra.detalle, compra.total, compra.descuento)"-->
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Creditos=====================================-->
+        <div class="tab-pane fade" id="v-pills-creditos" role="tabpanel"
+             aria-labelledby="v-pills-ver-creditos-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4"> Compras Al Crédito</h3>
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="col">
+                            <!--<input *ngIf="!refreshAutocomplete" autocompleteSuggestion [config]="configProveedor" [items]="personas"
+                                   id="input-proveedor-deudor"
+                                   (selectEvent)="selectProveedorAPagar($event)"
+                                   placeholder="Nombre del Proveedor"
+                            >-->
+                            <app-suggestions-local [config]="configProveedor"
+                                                   [data]="personas"
+                                                   (selectedSuggestionEvent)="selectProveedorAPagar($event)"
+                            ></app-suggestions-local>
+                        </div>
+                        <div class="col">
+                            <input numberFloat type="number" min="0" class="form-control" [(ngModel)]="pago.cuota"
+                                   [ngClass]="{'is-invalid': !pago.cuota }" (keydown.enter)="submitPago()"
+                                   placeholder="Monto" name="cuota"
+                            >
+                        </div>
+                        <div class="pl-1">
+                            <button class="btn btn-outline-info" title="button" (click)="submitPago()" [disabled]="!pago.cuota || !pago.proveedor_id">Realizar pago</button>
+                            <button class="btn btn-info" title="button" (click)="onClickGetCredits()">Ver todos los créditos</button>
+                        </div>
+                    </div>
+                    <div class="row pt-3">
+                        <div class="col-md-12 pb-4">
+                            <h5 class="text-center">Total por pagar: {{ totalPagar | number:'0.0-2' }}  Cambio: {{ cambio }}</h5>
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Empleado</th>
+                                    <th scope="col">Proveedor</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Tipo de compra</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Descuento</th>
+                                    <th scope="col">Cuotas</th>
+                                    <th scope="col">Detalles</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let credito of creditos">
+                                    <td>{{ credito.empleado}}</td>
+                                    <td>{{ credito.proveedor}}</td>
+                                    <td>{{ credito.fecha_hora}}</td>
+                                    <td>
+                                        <span *ngIf="credito.tipo === 'co'">Contado</span>
+                                        <span *ngIf="credito.tipo === 'cr'">Crédito</span>
+                                    </td>
+                                    <td>{{ credito.total}}</td>
+                                    <td>{{ credito.descuento}}</td>
+                                    <td>{{ credito.cuotas}}</td>
+                                    <td>
+                                        <a title="Ver" href="javascript:void(0);" (click)="showDetalles(credito.detalle, credito.total, credito.descuento)" class="mr-2"
+                                           data-toggle="modal" data-target="#detallesModal">
+                                            <span class="oi oi-eye" style="top: 0.2rem !important;"></span></a>
+                                        <a title="Cuotas" href="javascript:void(0);" (click)="showCuotas(credito.pagos)"
+                                           data-toggle="modal" data-target="#cuotasModal">
+                                            <span class="oi oi-dollar"></span></a><!--(click)="showDetalles(compra.detalle, compra.total, compra.descuento)"-->
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--===============================================Modal Proveedor===============================================-->
+<div class="modal fade" id="proveedorModal" tabindex="-1" role="dialog" aria-labelledby="proveedorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="proveedorModalLabel">Nuevo Proveedor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form-persona [rol]="'r'"
+                              (personaIdEmitter)="setIdProveedor($event)"
+                >
+                </form-persona>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Detalles===============================================-->
+<div class="modal fade" id="detallesModal" tabindex="-1" role="dialog" aria-labelledby="detallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detallesModalLabel">Detalles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table *ngIf="detalles"  class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let detalle of detalles">
+                        <td>{{ detalle.descripcion}}</td>
+                        <td>{{ detalle.cantidad+' '+detalle.tipo_unidad}}</td>
+                        <td>{{ detalle.precio_unitario}}</td>
+                        <td>{{ detalle.subtotal}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="float-right">
+                    <h6>Total: {{total}}</h6>
+                    <h6>Descuento: {{ descuento }}</h6>
+                    <h6 >Total Con Descuento: {{ total - descuento}}</h6>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===============================================Modal Cuotas===============================================-->
+<div class="modal fade" id="cuotasModal" tabindex="-1" role="dialog" aria-labelledby="cuotasModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cuotasModalLabel">Cuotas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table *ngIf="dataCuotas"  class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Fecha y hora</th>
+                        <th scope="col">Cuota</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let cuota of dataCuotas">
+                        <td>{{ cuota.fecha_hora}}</td>
+                        <td>{{ cuota.cuota }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

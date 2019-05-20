@@ -1,0 +1,384 @@
+<div class="sidenav">
+    <div class="nav flex-column nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+        <a class="nav-link active show" id="v-pills-usuarios-tab" data-toggle="pill" href="#v-pills-usuarios" role="tab"
+           aria-controls="v-pills-usuarios" aria-selected="true">
+            <i class="fas fa-user fa-2x pb-2 pt-2"></i>Usuarios</a>
+        <a class="nav-link" id="v-pills-sesiones-tab" data-toggle="pill" href="#v-pills-sesion" role="tab"
+           aria-controls="v-pills-caja" aria-selected="true">
+            <i class="fas fa-file-alt fa-2x pb-2 pt-2"></i>Sesiones</a>
+    </div>
+</div>
+<div class="main">
+    <div class="tab-content" id="v-pills-tabContent">
+        <!--============================================Tab de Usuarios=====================================-->
+        <div class="tab-pane fade active show" id="v-pills-usuarios" role="tabpanel"
+             aria-labelledby="v-pills-usuarios-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4">{{ titulo }}</h3>
+                <div class="d-flex justify-content-end">
+                    <a [ngClass]="{'link-diabled': modeEdit }"
+                       href="javascript:void(0);"
+                       data-toggle="modal"
+                       data-target="#personaModal"
+                       class="btn"
+                    >
+                        <span class="oi oi-person size-icons-13"></span> Nuevo Empleado
+                    </a>
+                    <a [ngClass]="{'link-diabled': modeEdit }" href="javascript:void(0);"
+                       class="btn" (click)="setModeCreate()">
+                        <span *ngIf="!modeCreate"><span title="Nueva Usuario" class="oi oi-plus size-icons-13"></span> Nuevo Usuario</span>
+                        <span *ngIf="modeCreate"><span title="Ver Usuarios" class="oi oi-eye size-icons-13"></span> Ver Usuarios</span>
+                    </a>
+                </div>
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="col-lg-12">
+                        <div *ngIf="!modeCreate; else templateFormCuenta">
+                            <form #formEditCuenta="ngForm" id="form-edit-cuenta" (ngSubmit)="onSubmitEdit()">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Nombre de Usuario</th>
+                                        <th scope="col">Contrasenia</th>
+                                        <th scope="col">Tipo de Usuario</th>
+                                        <th scope="col">Permisos</th>
+                                        <th scope="col">Habilitada</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ng-container *ngIf="!modeEdit; else templateFormEditCuenta">
+                                        <tr *ngFor="let cuenta of cuentas">
+                                            <td>{{ cuenta.nombre}}</td>
+                                            <td>{{ cuenta.usuario}}</td>
+                                            <td>{{ cuenta.contrasenia}}</td>
+                                            <td>{{ cuenta.nivel_acceso == 0 ? 'Administrador':'Empleado'}}</td>
+                                            <td>
+                                                <span *ngIf="cuenta.permisos.option1">{{ 'Inventario'}}<br></span>
+                                                <span *ngIf="cuenta.permisos.option2">{{ 'Ventas'}}</span>
+                                            </td>
+                                            <td>{{ cuenta.habilitada ? 'Si':'No'}}</td>
+                                            <td>
+                                                <a class="btn " href
+                                                   (click)="setModeEdit(cuenta)"><span
+                                                        class="oi oi-pencil"></span></a>
+                                                <a class="btn" href
+                                                   data-toggle="modal" data-target="#modalDeleteData"
+                                                   (click)="setDataToDelete(cuenta?.id_persona, 'cuenta')"
+                                                >
+                                                    <span class="oi oi-trash"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <!--====================Template Edit Cuentas============================-->
+                                    <ng-template #templateFormEditCuenta>
+                                        <tr>
+                                            <td>{{ editCuenta.nombre}}</td>
+                                            <td>
+                                                <input #usuario="ngModel" type="text"
+                                                       name="usuario" placeholder="Nombre de la Cuenta"
+                                                       class="form-control"
+                                                       [ngClass]="{'is-invalid': !usuario.valid}"
+                                                       required
+                                                       [(ngModel)]="editCuenta.usuario"
+                                                >
+                                            </td>
+                                            <td>
+                                                <input #contrasenia="ngModel" type="text"
+                                                       name="contrasenia" placeholder="Contraseña"
+                                                       class="form-control"
+                                                       [ngClass]="{'is-invalid': !contrasenia.valid}"
+                                                       required
+                                                       [(ngModel)]="editCuenta.contrasenia"
+                                                >
+                                            </td>
+                                            <td>
+                                                <div class="form-group form-control">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="edit_nivel_acceso"
+                                                               id="editOption1"
+                                                               [(ngModel)]="editCuenta.nivel_acceso" [value]="0" [checked]="editCuenta.nivel_acceso==0"
+                                                        >
+                                                        <label class="form-check-label"
+                                                               for="editOption1">Administrador</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="edit_nivel_acceso"
+                                                               id="editOption2"
+                                                               [(ngModel)]="editCuenta.nivel_acceso" [value]="1" [checked]="editCuenta.nivel_acceso==1"
+                                                        >
+                                                        <label class="form-check-label"
+                                                               for="editOption2">Empleado</label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group form-control">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" name="edit_permisos"
+                                                               type="checkbox" id="editChbxOption1"
+                                                               (change)="checkboxChange('p1')"
+                                                               [checked]="editCuenta.permisos.option1"
+                                                        >
+                                                        <label class="form-check-label"
+                                                               for="editChbxOption1">Inventatio</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" name="edit_permisos"
+                                                               type="checkbox" id="editChbxOption2"
+                                                               (change)="checkboxChange('p2')"
+                                                               [checked]="editCuenta.permisos.option2"
+                                                        >
+                                                        <label class="form-check-label"
+                                                               for="editChbxOption2">Ventas</label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group form-control">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="edit_habilitada"
+                                                               id="editHabilitada1"
+                                                               [(ngModel)]="editCuenta.habilitada" [value]="true"
+                                                        >
+                                                        <label class="form-check-label" for="editHabilitada1">Si</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="edit_habilitada"
+                                                               id="editHabilitada2"
+                                                               [(ngModel)]="editCuenta.habilitada" [value]="false"
+                                                        >
+                                                        <label class="form-check-label" for="editHabilitada2">No</label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group" aria-label="Basic example">
+                                                    <button type="submit" class="btn btn-outline-info"
+                                                            [disabled]="!formEditCuenta.form.valid">
+                                                        Actualizar
+                                                    </button>
+                                                    <button type="reset" class="btn btn-outline-danger"
+                                                            (click)="cancelModeEdit()">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                    <!--====================Template Edit Cuentas End============================-->
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                        <!--===============================================Formulario Para Nueva Cuenta==============================================-->
+                        <ng-template #templateFormCuenta>
+                            <form #formCuenta="ngForm" id="form-cuenta" (submit)="onSubmit()">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <div class="form-group">
+                                            <label>Contraseña</label>
+                                            <input #contrasenia="ngModel" type="text"
+                                                   name="contrasenia" placeholder="Contraseña"
+                                                   class="form-control"
+                                                   [ngClass]="{'is-invalid': !contrasenia.valid}"
+                                                   required
+                                                   [(ngModel)]="cuenta.contrasenia"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label>Nivel de Acceso</label>
+                                        <div class="form-group form-control">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="nivel_acceso"
+                                                       id="option1"
+                                                       [(ngModel)]="cuenta.nivel_acceso" [value]="false"
+                                                >
+                                                <label class="form-check-label" for="option1">Administrador</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="nivel_acceso"
+                                                       id="option2"
+                                                       [(ngModel)]="cuenta.nivel_acceso" [value]="true"
+                                                >
+                                                <label class="form-check-label" for="option2">Empleado</label>
+                                            </div>
+                                        </div>
+                                        <!--<input type="text" #stock="ngModel"
+                                               id="inputStock"
+                                               class="form-control"
+                                               [ngClass]="{'is-invalid': !stock.valid}"
+                                               [(ngModel)]="producto.stock" name="stock"
+                                               placeholder="Stock"
+                                               required
+                                               pattern="[0-9]*"
+                                        >-->
+                                    </div>
+                                    <div class="form-group col-auto">
+                                        <label>Permisos</label>
+                                        <div class="form-group form-control">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" name="permisos"
+                                                       [(ngModel)]="cuenta.permisos.option1"
+                                                       type="checkbox" id="chbxOption1"
+                                                >
+                                                <label class="form-check-label" for="chbxOption1">Inventatio</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" name="permisos"
+                                                       [(ngModel)]="cuenta.permisos.option2"
+                                                       type="checkbox" id="chbxOption2"
+                                                >
+                                                <label class="form-check-label" for="chbxOption2">Ventas</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-auto">
+                                        <label>Habilitada</label>
+                                        <div class="form-group form-control">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="habilitada"
+                                                       id="optionSi"
+                                                       [(ngModel)]="cuenta.habilitada" [value]="true"
+                                                >
+                                                <label class="form-check-label" for="optionSi">Si</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="habilitada"
+                                                       id="optionNo"
+                                                       [(ngModel)]="cuenta.habilitada" [value]="false">
+                                                <label class="form-check-label" for="optionNo">No</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto my-2">
+                                        <label></label>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-info">
+                                                <!--<button type="submit" class="btn btn-outline-info" [disabled]="!formProducto.form.valid" >-->
+                                                Registrar
+                                            </button>
+                                            <button type="reset" class="btn btn-outline-danger" (click)="clean()">
+                                                Limpiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--============================================Tab de Sesiones=====================================-->
+        <div class="tab-pane fade" id="v-pills-sesion" role="tabpanel"
+             aria-labelledby="v-pills-sesion-tab">
+            <div class="col-md-12">
+                <h3 class="mb-4">Sesiones</h3>
+                <div class="col-12">
+                    <div class="form-row">
+                        <div class="col-md-4">
+                            <label for="dateStart">Fecha Inicio</label>
+                            <input (change)="selectedDate($event,1)" type="date" class="form-control pb-1" id="dateStart"
+                                   [ngModel]="dates.date1">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dateEnd">Fecha Fin</label>
+                            <input (change)="selectedDate($event,2)" type="date" class="form-control pb-1" id="dateEnd"
+                                   [ngModel]="dates.date2"></div>
+                        <div class="col-md-4">
+                            <label for="dateEnd">Empleado</label>
+                            <!--<input autocompleteSuggestion [config]="configEmpleados" [items]="empleados"
+                                   id="input-empleado"
+                                   (selectEvent)="selectedEmpleado($event)"
+                                   placeholder="Nombre del Empleado"
+                            >-->
+                            <app-suggestions-local [config]="configEmpleados"
+                                                   [data]="empleados"
+                                                   (selectedSuggestionEvent)="selectedEmpleado($event)"
+                            ></app-suggestions-local>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="col-lg-12">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th scope="col">Nombre de Usuario</th>
+                                <th scope="col">Fecha y hora de entrada</th>
+                                <th scope="col">Fecha y hora de salida</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let session of sessions | sessionFilter: sessionsFilterText">
+                                <td>{{ session.usuario}}</td>
+                                <td>{{ session.inicio_fecha_hora}}</td>
+                                <td>{{ session.fin_fecha_hora}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Modal Personas=====================================================-->
+<div class="modal fade" id="personaModal" tabindex="-1" role="dialog" aria-labelledby="personaModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="personaModalLabel">Personas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form-persona [rol]="'e'"
+                              (personaIdEmitter)="setIdCuenta($event)"
+                >
+                </form-persona>
+                <!--<form-persona [persona]="persona"
+                              (cancelModeEditEmitter)="cancelModeEdit($event)"
+                              (onSubmitEmitter)="onSubmit()"
+                ></form-persona>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--======================================================Modal Delete Cuenta=====================================================-->
+
+<div class="modal fade" id="modalDeleteData" tabindex="-1" role="dialog" aria-labelledby="modalCenterDataDelete" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning" >
+                <h5 class="modal-title" id="modalCenterCuentaDelete">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <!--<div class="alert alert-danger" role="alert">
+
+                </div>-->
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la cuenta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" (click)="deleteData()">&nbsp; SI &nbsp;</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">&nbsp; NO &nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>
